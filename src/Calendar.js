@@ -1,11 +1,15 @@
 import React from "react";
 import dateFns from "date-fns";
+import {Popover, ButtonToolbar, OverlayTrigger, Button} from "react-bootstrap";
 
 class Calendar extends React.Component {
   state = {
     currentMonth: new Date(),
-    selectedDate: new Date()
+    selectedDate: new Date(),
+    popOverShow: false
   };
+
+
 
   renderHeader() {
     const dateFormat = "MMMM YYYY";
@@ -51,6 +55,12 @@ class Calendar extends React.Component {
     const startDate = dateFns.startOfWeek(monthStart);
     const endDate = dateFns.endOfWeek(monthEnd);
 
+    const popoverBottom = (
+        <Popover id="popover-positioned-bottom" title="Popover Bottom">
+          <strong>Holy guacamole!</strong> Check this info.
+        </Popover>
+    );
+
     const dateFormat = "D";
     const rows = [];
 
@@ -63,18 +73,21 @@ class Calendar extends React.Component {
         formattedDate = dateFns.format(day, dateFormat);
         const cloneDay = day;
         days.push(
-          <div
-            className={`col cell ${
-              !dateFns.isSameMonth(day, monthStart)
-                ? "disabled"
-                : dateFns.isSameDay(day, selectedDate) ? "selected" : ""
-            }`}
-            key={day}
-            onClick={() => this.onDateClick(dateFns.parse(cloneDay))}
-          >
-            <span className="number">{formattedDate}</span>
-            <span className="bg">{formattedDate}</span>
-          </div>
+            <OverlayTrigger trigger="click" placement="bottom" overlay={popoverBottom}>
+    
+                <div
+                    className={`col cell ${
+                    !dateFns.isSameMonth(day, monthStart)
+                        ? "disabled"
+                        : dateFns.isSameDay(day, selectedDate) ? "selected" : ""
+                    }`}
+                    key={day}
+                    onClick={() => this.onDateClick(dateFns.parse(cloneDay))}
+                >
+                    <span className="number">{formattedDate}</span>
+                    <span className="bg">{formattedDate}</span>
+                </div>
+            </OverlayTrigger>
         );
         day = dateFns.addDays(day, 1);
       }
@@ -85,7 +98,10 @@ class Calendar extends React.Component {
       );
       days = [];
     }
-    return <div className="body">{rows}</div>;
+    return (<div className="body">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+        {rows}
+</div>);
   }
 
   onDateClick = day => {
