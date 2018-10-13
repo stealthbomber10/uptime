@@ -17,6 +17,7 @@ import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import * as firebase from 'firebase';
 import firebase_config from './firebase-config.js'
 import './index.css';
+import App from './App'
 
 firebase.initializeApp(firebase_config);
 const database = firebase.database();
@@ -277,13 +278,13 @@ class Tasks extends React.Component {
 	}
 }
 
-function App(props) {
-	return (
-		<div>
-			<MainRoutes></MainRoutes>
-		</div>
-	)
-}
+// function App(props) {
+// 	return (
+// 		<div>
+// 			<MainRoutes></MainRoutes>
+// 		</div>
+// 	)
+// }
 
 function Header(props) {
 	return (
