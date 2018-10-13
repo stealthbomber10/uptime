@@ -17,12 +17,8 @@ import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import * as firebase from 'firebase';
 import firebase_config from './firebase-config.js';
 import './index.css';
-<<<<<<< HEAD
-import App from './App'
-=======
 import Calendar from './Calendar';
 import App from './App';
->>>>>>> a94ccbdd34362539738a5ba0f861677d2a7eb266
 
 firebase.initializeApp(firebase_config);
 const database = firebase.database();
