@@ -1,6 +1,6 @@
 import React from "react";
 import dateFns from "date-fns";
-import {Popover, ButtonToolbar, OverlayTrigger, Button, Modal} from "react-bootstrap";
+import {Popover, ButtonToolbar, OverlayTrigger, Button, Modal, DropdownButton, MenuItem} from "react-bootstrap";
 
 class Calendar extends React.Component {
   state = {
@@ -110,10 +110,75 @@ class Calendar extends React.Component {
                  <strong>Task name: </strong> 
                  <input type="text" name="event_title" id="event_title"/>
               </label>
-           
                  <br></br>
-                 <strong>Start Time:</strong><input type="text" name="start_time" id="start_time"/><br></br>
-                 <strong>End Time:</strong><input type="text" name="end_time" id="end_time"/>
+                 <DropdownButton
+                  bsStyle="default"
+                  bsSize="small"
+                  style={{ maxHeight: "28px" }}
+                  title={"Start Time"}
+                  key={1}
+                  id="start_time"
+                >
+                  <MenuItem eventKey="1">12AM</MenuItem>
+                  <MenuItem eventKey="2">1AM</MenuItem>
+                  <MenuItem eventKey="3">2AM</MenuItem>
+                  <MenuItem eventKey="4">3AM</MenuItem>
+                  <MenuItem eventKey="5">4AM</MenuItem>
+                  <MenuItem eventKey="6">5AM</MenuItem>
+                  <MenuItem eventKey="7">6AM</MenuItem>
+                  <MenuItem eventKey="8">7AM</MenuItem>
+                  <MenuItem eventKey="9">8AM</MenuItem>
+                  <MenuItem eventKey="10">9AM</MenuItem>
+                  <MenuItem eventKey="11">10AM</MenuItem>
+                  <MenuItem eventKey="12">11AM</MenuItem>
+                  <MenuItem eventKey="13">12pM</MenuItem>
+                  <MenuItem eventKey="14">1PM</MenuItem>
+                  <MenuItem eventKey="15">2PM</MenuItem>
+                  <MenuItem eventKey="16">3PM</MenuItem>
+                  <MenuItem eventKey="17">4PM</MenuItem>
+                  <MenuItem eventKey="18">5PM</MenuItem>
+                  <MenuItem eventKey="19">6PM</MenuItem>
+                  <MenuItem eventKey="20">7PM</MenuItem>
+                  <MenuItem eventKey="21">8PM</MenuItem>
+                  <MenuItem eventKey="22">9PM</MenuItem>
+                  <MenuItem eventKey="23">10PM</MenuItem>
+                  <MenuItem eventKey="24">11PM</MenuItem>
+                </DropdownButton>
+                <DropdownButton
+                  bsStyle="default"
+                  bsSize="small"
+                  style={{ maxHeight: "28px" }}
+                  title={"End Time"}
+                  key={2}
+                  id="end_time"
+                >
+                  <MenuItem eventKey="1">12AM</MenuItem>
+                  <MenuItem eventKey="2">1AM</MenuItem>
+                  <MenuItem eventKey="3">2AM</MenuItem>
+                  <MenuItem eventKey="4">3AM</MenuItem>
+                  <MenuItem eventKey="5">4AM</MenuItem>
+                  <MenuItem eventKey="6">5AM</MenuItem>
+                  <MenuItem eventKey="7">6AM</MenuItem>
+                  <MenuItem eventKey="8">7AM</MenuItem>
+                  <MenuItem eventKey="9">8AM</MenuItem>
+                  <MenuItem eventKey="10">9AM</MenuItem>
+                  <MenuItem eventKey="11">10AM</MenuItem>
+                  <MenuItem eventKey="12">11AM</MenuItem>
+                  <MenuItem eventKey="13">12pM</MenuItem>
+                  <MenuItem eventKey="14">1PM</MenuItem>
+                  <MenuItem eventKey="15">2PM</MenuItem>
+                  <MenuItem eventKey="16">3PM</MenuItem>
+                  <MenuItem eventKey="17">4PM</MenuItem>
+                  <MenuItem eventKey="18">5PM</MenuItem>
+                  <MenuItem eventKey="19">6PM</MenuItem>
+                  <MenuItem eventKey="20">7PM</MenuItem>
+                  <MenuItem eventKey="21">8PM</MenuItem>
+                  <MenuItem eventKey="22">9PM</MenuItem>
+                  <MenuItem eventKey="23">10PM</MenuItem>
+                  <MenuItem eventKey="24">11PM</MenuItem>
+                </DropdownButton>
+                 {/* <strong>Start Time:</strong><input type="text" name="start_time" id="start_time"/><br></br> */}
+                 {/* <strong>End Time:</strong><input type="text" name="end_time" id="end_time"/> */}
                  <button onClick={this.saveEvent}>Save</button>
         </Popover>
     );
