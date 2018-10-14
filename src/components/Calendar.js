@@ -47,7 +47,7 @@ class Calendar extends React.Component {
     selectedDate: new Date(),
     events: {},
     eventDetailsShow: false,
-    category: 'homework',
+    category: {value: 'homework', label: 'Homework'},
     start: '12AM',
     end: '12AM'
   };
@@ -221,7 +221,7 @@ class Calendar extends React.Component {
   }
 
   handleEndChange = (selectedOption) => {
-    fetch("http://104.196.67.238/getActualTime?title=" + document.getElementById('event_title').value + "&category=" + this.state.homework)
+    fetch("http://104.196.67.238/getActualTime?title=" + document.getElementById('event_title').value + "&category=" + this.state.category.value)
       .then(res => res.json())
       .then(
         (result) => {
