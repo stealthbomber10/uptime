@@ -21,4 +21,4 @@ if __name__ == "__main__":
     test_calculated_values = regression.predict(np.asarray(test_expected).reshape(-1, 1))
 
     print test_calculated_values[0]
-    print "Total time taken was {}".format(time.time() - start)
+    # print "Total time taken was {}".format(time.time() - start)
