@@ -5,38 +5,25 @@ import sys, pickle, time
 
 if __name__ == "__main__":
     start = time.time()
-    allExpected = [randint(20, 40) for x in range(0, 1000)]
-    allActual = [(x + randint(-10, 10)) for x in allExpected]
+    user_parameter = 0.7
+    all_expected = [randint(60,80) for x in range(0, 100)]
+    all_actual = [(x + randint(-10, 10)) for x in all_expected]
+    train_all_expected = all_expected[:len(all_expected)/2]
+    test_all_expected = all_expected[:-len(all_expected)/2]
+    train_all_actual = all_actual[:len(all_actual)/2]
+    test_all_actual = all_actual[:-len(all_actual)/2]
+    all_regression = linear_model.LinearRegression()
+    all_regression.fit(np.asarray(train_all_expected).reshape(-1, 1), train_all_actual)
 
-    userExpected = [randint(800, 3000) for x in range(0, 10)]
-    userActual = [(x + randint(-10, 10)) for x in userExpected]
+    user_expected = [randint(40, 60) for x in range(0, 10)]
+    user_actual = [(x + randint(-10, 10)) for x in user_expected]
+    train_user_actual = user_actual[:len(user_actual)/2]
+    test_user_actual = user_actual[:-len(user_actual)/2]
+    train_user_expected = user_expected[:len(user_expected)/2]
+    test_user_expected = user_expected[:-len(user_expected)/2]
+    user_regression = linear_model.LinearRegression()
+    user_regression.fit(np.asarray(train_user_expected).reshape(-1, 1), train_user_actual)
 
-    allParameter = 0.3
-    copy = ((float)(len(allExpected) / allParameter) * (1 - allParameter)) / len(userExpected)
-
-    # if len(userActual) == 0:
-    #     userWeightParameter = 0
-    #     allWeightParameter = 1
-    # else: 
-    #      userWeightParameter = 0.7 * (len(userExpected) + len(allExpected)) / len(userExpected)
-    #      allWeightParameter = 0.3 * (len(userExpected) + len(allExpected)) / len(allExpected)
-    
-    expected = allExpected[:]
-    temp = userExpected * (int)(copy - 1)
-    expected += temp 
-    actual = [(x + randint(-10, 10)) for x in expected]
-    #checked
-
-    expected[len(allExpected)-1]
-    train_expected = expected[:lern(allExpected)/2-1] + expected[len(allExpected):len(allExpected)+len(userExpected)/2-1] #the last 20 elements in all expected + the last five in user expected
-    test_expected = expected[len(allExpected)/2:len(allExpected)-1] + expected[len(allExpected)+len(userExpected)/2-1:] #the first ...
-    
-    train_actual = actual[:len(allExpected)/2-1] + actual[len(allExpected):len(allExpected)+len(userExpected)/2-1]
-    test_actual = actual[len(allExpected)/2:len(allExpected)-1] + actual[len(allExpected)+len(userExpected)/2-1:]
-
-    regression = linear_modßel.LinearRegression()
-    regression.fit(np.asarray(train_expected).reshape(-1, 1), train_actual)
-    
     # Steps before use:
     # * Variables 'expected' and 'actual' need to change, according to the data stored in the DB
     # (Could be saved as a json or provided as input)
@@ -48,12 +35,23 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1 and sys.argv[1] == "1":
     
-        test_calculated_values = regression.predict(np.asarray(test_expected).reshape(-1, 1))
-        print test_calculated_values
+        test_all_calculated_values = all_regression.predict(np.asarray(test_all_expected).reshape(-1, 1))
+        test_user_calculated_values = user_regression.predict(np.asarray(test_user_expected).reshape(-1, 1))
+        if len(user_actual) == 0 & len(all_actual) == 0 : #user does a non-homework task for the first time
+            test_weighted_calculated_values = user_expected
+        elif len(user_actual) == 0 : #user does a homework task for the first time
+            test_weighted_calculated_values = test_all_calculated_values
+        elif len(all_actual) == 0 : #user does a non-home work task for !first time
+            test_weighted_calculated_values = test_user_calculated_values
+        else : #homework task and !first time
+            test_weighted_calculated_values = [x * user_parameter + y * (1 - user_parameter) for x, y in zip(test_user_calculated_values, test_all_calculated_values)]
+
+        print test_weighted_calculated_values, "\n", test_all_actual, "\n", test_user_actual
 
     else:
 
-        pickle.dump(regression, open("durationPredictor.sav", "wb"))
+        pickle.dump(user_regression, open("durationPredictor.sav", "wb"))
+        pickle.dump(all_regression, open("durationPredictor.sav", "wb"))
         print "Model saved!"
 
     print "Total time taken was {}".format(time.time() - start)
