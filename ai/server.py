@@ -5,6 +5,7 @@ import numpy as np
 import pickle, json
 import firebase_admin
 from firebase_admin import credentials, db
+from flask_cors import CORS
 
 cred = credentials.Certificate("uptime-69073-firebase-adminsdk-6wylj-bfbf8cb7e4.json")
 firebase_admin.initialize_app(cred, {
@@ -76,6 +77,7 @@ def calculatePredictionScoreFromTitle(title, category="homework"):
     return avg
 
 app = Flask(__name__)
+cors = CORS(app)
 
 @app.route('/')
 def hello():

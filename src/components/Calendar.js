@@ -1,7 +1,9 @@
 import React from "react";
 import dateFns from "date-fns";
-import {Popover, ButtonToolbar, OverlayTrigger, Button, Modal, DropdownButton, MenuItem} from "react-bootstrap";
-import db from '../base';
+import Dropdown from 'react-dropdown'
+import 'react-dropdown/style.css'
+import {Popover, ButtonToolbar, OverlayTrigger, Button, Modal, MenuItem} from "react-bootstrap";
+import {db, auth} from '../base';
 
 function getValues(snap) {
 	const values = snap.val();
@@ -39,25 +41,15 @@ function getTasks(filter, callback) {
 	});
 }
 
-function ListItem(props) {
-	var removeStyle = {
-		paddingLeft: '80px',
-		color:'red'
-	}
-	return (
-		<li>
-			<Link to={props.url + props.value}>{props.value}</Link>
-			<span className="remove" style={removeStyle} onClick={() => props.remove(props.value)}>X</span>
-		</li>
-	)
-}
-
 class Calendar extends React.Component {
   state = {
     currentMonth: new Date(),
     selectedDate: new Date(),
     events: {},
-    eventDetailsShow: false
+    eventDetailsShow: false,
+    category: 'homework',
+    start: '12AM',
+    end: '12AM'
   };
 
   constructor(props) {
@@ -65,6 +57,67 @@ class Calendar extends React.Component {
     this.saveEvent = this.saveEvent.bind(this);
     this.handleShow = this.handleShow.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.getTasks = this.getTasks.bind(this);
+  }
+
+  pushTask(title, category, time_start, time_end, day) {
+    var uid = auth.currentUser.uid;
+    var formattedDate = dateFns.format(day, 'YYYY-MM-DD')
+    var dbRef = db.ref('/tasks/' + uid + '/' + formattedDate);
+    var task_item = {
+      'title': title,
+      'category': category,
+      'time_start': time_start,
+      'time_end': time_end
+    }
+    dbRef.push(task_item).then(() => {
+      document.getElementById('event_title').value = "";
+    }).catch((error) => {
+      console.log("There was an error while updating tasks in Firebase: " + error);
+    });
+  }
+
+  getTasks() {
+    var dbRef = db.ref('/tasks/' + auth.currentUser.uid);
+    dbRef.once('value', snap => {
+      var value_items = snap.val();
+      var temp_events = {}
+      if(value_items !== null && value_items !== undefined) {
+        for (var key in value_items) {
+            if (value_items.hasOwnProperty(key)) {
+                var date_text = key;
+                var date = dateFns.parse(date_text);
+                var task_obj = value_items[key]
+                for (var task_key in task_obj) {
+                  if (task_obj.hasOwnProperty(task_key)) {
+                    var task = task_obj[task_key];
+                    if (task !== undefined) {
+                      var category = task['category'];
+                      var start_time = task['time_end'];
+                      var end_time = task['time_start'];
+                      var title = task['title'];
+                      if(temp_events[date] == null)
+                        temp_events[date] = []
+                      temp_events[date].push({
+                        'time_start': start_time,
+                        'time_end': end_time,
+                        'event_category': category,
+                        'event_title': title
+                      });
+                    }
+                  }
+                }
+            }
+        }
+        this.setState({
+          events: temp_events,
+        });
+      }
+    });
+  }
+
+  componentDidMount() {
+    this.getTasks();
   }
 
   handleClose() {
@@ -78,7 +131,6 @@ class Calendar extends React.Component {
         time_start: item.time_start,
         time_end: item.time_end 
     });
-    console.log(this.state.eventDetailsShow);
   }
 
 
@@ -135,16 +187,59 @@ class Calendar extends React.Component {
       let temp_events = this.state.events;
       if(temp_events[this.state.selectedDate] == null)
         temp_events[this.state.selectedDate] = []
+      var title = document.getElementById('event_title').value;
+      var category = this.state.category;
+      var start = this.state.start;
+      var end = this.state.end;
       temp_events[this.state.selectedDate].push({
-          event_title: document.getElementById('event_title').value,
-          event_category: "",
-          time_start: document.getElementById('start_time').value,
-          time_end: document.getElementById('end_time').value,
+          event_title: title,
+          event_category: category.value,
+          time_start: start.value,
+          time_end: end.value,
         });
       this.setState({
           events: temp_events,
+          category: {label: "Homework", value: "homework"},
+          start: "12AM",
+          end: "12AM"
       })
+      console.log(start)
+      this.pushTask(title, category, start.value, end.value, this.state.selectedDate);
       return false;
+  }
+
+  handleCategoryChange = (selectedOption) => {
+    this.setState({ 
+      category: selectedOption
+    });
+  }
+
+  handleStartChange = (selectedOption) => {
+    this.setState({ 
+      start: selectedOption 
+    });
+  }
+
+  handleEndChange = (selectedOption) => {
+    fetch("http://104.196.67.238/getActualTime?title=" + document.getElementById('event_title').value + "&category=" + this.state.homework)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          console.log(result)
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          this.setState({
+            isLoaded: true,
+            error
+          });
+        }
+      )
+    this.setState({ 
+      end: selectedOption 
+    });
   }
 
   renderCells() {
@@ -154,92 +249,48 @@ class Calendar extends React.Component {
     const startDate = dateFns.startOfWeek(monthStart);
     const endDate = dateFns.endOfWeek(monthEnd);
 
+    const category_options = [
+      {
+        "value": "homework",
+        "label": "Homework"
+      },
+      {
+        "value": "selfdev",
+        "label": "Self-Help"
+      },
+      {
+        "value": "chore",
+        "label": "Chore"
+      }
+    ]
+
+    const start_time_options = ["12AM"]
+    for (var i = 1; i < 12; i ++)
+      start_time_options.push(i + "AM");
+    start_time_options.push("12PM");
+    for (var i = 1; i < 12; i ++)
+      start_time_options.push(i + "PM");
+
+    const end_time_options = ["12AM"]
+    for (var i = 1; i < 12; i ++)
+      end_time_options.push(i + "AM");
+    end_time_options.push("12PM");
+    for (var i = 1; i < 12; i ++)
+      end_time_options.push(i + "PM");
+
+
     const popoverBottom = (
         <Popover id="popover-positioned-bottom" title="Add Task">
               <label>
                  <strong>Task name: </strong> 
                  <input type="text" name="event_title" id="event_title"/>
               </label>
-              <DropdownButton
-                  bsStyle="default"
-                  bsSize="small"
-                  style={{ maxHeight: "28px" }}
-                  title={"Category"}
-                  key={1}
-                  id="event_category"
-                >
-                  <MenuItem eventKey="1">Homework</MenuItem>
-                  <MenuItem eventKey="2">Chores</MenuItem>
-                  <MenuItem eventKey="3">Self-Help</MenuItem>
-                </DropdownButton>
+                 <Dropdown id="event_category" id="event_category" options={category_options} value={this.state.category} placeholder="Select a category" onChange={this.handleCategoryChange}/>
                  <br></br>
                  <br></br>
-                 <DropdownButton
-                  bsStyle="default"
-                  bsSize="small"
-                  style={{ maxHeight: "28px" }}
-                  title={"Start Time"}
-                  key={2}
-                  id="start_time"
-                >
-                  <MenuItem eventKey="1">12AM</MenuItem>
-                  <MenuItem eventKey="2">1AM</MenuItem>
-                  <MenuItem eventKey="3">2AM</MenuItem>
-                  <MenuItem eventKey="4">3AM</MenuItem>
-                  <MenuItem eventKey="5">4AM</MenuItem>
-                  <MenuItem eventKey="6">5AM</MenuItem>
-                  <MenuItem eventKey="7">6AM</MenuItem>
-                  <MenuItem eventKey="8">7AM</MenuItem>
-                  <MenuItem eventKey="9">8AM</MenuItem>
-                  <MenuItem eventKey="10">9AM</MenuItem>
-                  <MenuItem eventKey="11">10AM</MenuItem>
-                  <MenuItem eventKey="12">11AM</MenuItem>
-                  <MenuItem eventKey="13">12pM</MenuItem>
-                  <MenuItem eventKey="14">1PM</MenuItem>
-                  <MenuItem eventKey="15">2PM</MenuItem>
-                  <MenuItem eventKey="16">3PM</MenuItem>
-                  <MenuItem eventKey="17">4PM</MenuItem>
-                  <MenuItem eventKey="18">5PM</MenuItem>
-                  <MenuItem eventKey="19">6PM</MenuItem>
-                  <MenuItem eventKey="20">7PM</MenuItem>
-                  <MenuItem eventKey="21">8PM</MenuItem>
-                  <MenuItem eventKey="22">9PM</MenuItem>
-                  <MenuItem eventKey="23">10PM</MenuItem>
-                  <MenuItem eventKey="24">11PM</MenuItem>
-                </DropdownButton>
-                <DropdownButton
-                  bsStyle="default"
-                  bsSize="small"
-                  style={{ maxHeight: "28px" }}
-                  title={"End Time"}
-                  key={3}
-                  id="end_time"
-                >
-                  <MenuItem eventKey="1">12AM</MenuItem>
-                  <MenuItem eventKey="2">1AM</MenuItem>
-                  <MenuItem eventKey="3">2AM</MenuItem>
-                  <MenuItem eventKey="4">3AM</MenuItem>
-                  <MenuItem eventKey="5">4AM</MenuItem>
-                  <MenuItem eventKey="6">5AM</MenuItem>
-                  <MenuItem eventKey="7">6AM</MenuItem>
-                  <MenuItem eventKey="8">7AM</MenuItem>
-                  <MenuItem eventKey="9">8AM</MenuItem>
-                  <MenuItem eventKey="10">9AM</MenuItem>
-                  <MenuItem eventKey="11">10AM</MenuItem>
-                  <MenuItem eventKey="12">11AM</MenuItem>
-                  <MenuItem eventKey="13">12pM</MenuItem>
-                  <MenuItem eventKey="14">1PM</MenuItem>
-                  <MenuItem eventKey="15">2PM</MenuItem>
-                  <MenuItem eventKey="16">3PM</MenuItem>
-                  <MenuItem eventKey="17">4PM</MenuItem>
-                  <MenuItem eventKey="18">5PM</MenuItem>
-                  <MenuItem eventKey="19">6PM</MenuItem>
-                  <MenuItem eventKey="20">7PM</MenuItem>
-                  <MenuItem eventKey="21">8PM</MenuItem>
-                  <MenuItem eventKey="22">9PM</MenuItem>
-                  <MenuItem eventKey="23">10PM</MenuItem>
-                  <MenuItem eventKey="24">11PM</MenuItem>
-                </DropdownButton>
+                 <Dropdown id="start_time" id="start_time" options={start_time_options} value={this.state.start} placeholder="Select a category" onChange={this.handleStartChange}/>
+                 <Dropdown id="end_time" id="end_time" options={end_time_options} value={this.state.end} placeholder="Select a category" onChange={this.handleEndChange}/>
+                  
                  <button onClick={this.saveEvent}>Save</button>
         </Popover>
     );
@@ -311,7 +362,7 @@ class Calendar extends React.Component {
       days = [];
     }
     return (<div className="body">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossOrigin="anonymous" />
         {rows}
         <Modal show={this.state.eventDetailsShow} onHide={this.handleClose}>
           <Modal.Header closeButton>
