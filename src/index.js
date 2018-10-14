@@ -16,11 +16,9 @@ import ReactDOM from 'react-dom';
 import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import * as firebase from 'firebase';
 import './index.css';
-import Calendar from './Calendar';
+import Calendar from './components/Calendar';
 import App from './App';
-import { app, database } from './firebase-config';
-
-
+import { app, database } from './base';
 
 function getValues(snap) {
 	const values = snap.val();

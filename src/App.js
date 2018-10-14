@@ -1,15 +1,11 @@
 import React, { Component } from 'react';
 //import logo from './logo.svg';
 import './App.css';
-import Calendar from './Calendar';
+import Calendar from './components/Calendar';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 import PrivateRoute from './PrivateRoute';
-import app from './firebase-config'
-
-import Home from './Home';
-import LogIn from './LogIn';
-import SignUp from './SignUp';
+import app from './base'
 
 class App extends Component {
   state = { loading: true, authenticated: false, user: null };
