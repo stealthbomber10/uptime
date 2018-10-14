@@ -1,6 +1,7 @@
 import React from "react";
 import dateFns from "date-fns";
 import {Popover, ButtonToolbar, OverlayTrigger, Button, Modal, DropdownButton, MenuItem} from "react-bootstrap";
+import db from '../base';
 
 class Calendar extends React.Component {
   state = {
@@ -110,13 +111,26 @@ class Calendar extends React.Component {
                  <strong>Task name: </strong> 
                  <input type="text" name="event_title" id="event_title"/>
               </label>
+              <DropdownButton
+                  bsStyle="default"
+                  bsSize="small"
+                  style={{ maxHeight: "28px" }}
+                  title={"Category"}
+                  key={1}
+                  id="event_category"
+                >
+                  <MenuItem eventKey="1">Homework</MenuItem>
+                  <MenuItem eventKey="2">Chores</MenuItem>
+                  <MenuItem eventKey="3">Self-Help</MenuItem>
+                </DropdownButton>
+                 <br></br>
                  <br></br>
                  <DropdownButton
                   bsStyle="default"
                   bsSize="small"
                   style={{ maxHeight: "28px" }}
                   title={"Start Time"}
-                  key={1}
+                  key={2}
                   id="start_time"
                 >
                   <MenuItem eventKey="1">12AM</MenuItem>
@@ -149,7 +163,7 @@ class Calendar extends React.Component {
                   bsSize="small"
                   style={{ maxHeight: "28px" }}
                   title={"End Time"}
-                  key={2}
+                  key={3}
                   id="end_time"
                 >
                   <MenuItem eventKey="1">12AM</MenuItem>
@@ -177,8 +191,6 @@ class Calendar extends React.Component {
                   <MenuItem eventKey="23">10PM</MenuItem>
                   <MenuItem eventKey="24">11PM</MenuItem>
                 </DropdownButton>
-                 {/* <strong>Start Time:</strong><input type="text" name="start_time" id="start_time"/><br></br> */}
-                 {/* <strong>End Time:</strong><input type="text" name="end_time" id="end_time"/> */}
                  <button onClick={this.saveEvent}>Save</button>
         </Popover>
     );

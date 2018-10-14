@@ -5,7 +5,7 @@ import * as firebase from 'firebase';
 import './index.css';
 import Calendar from './components/Calendar';
 import App from './App';
-import { app, database } from './base';
+import { app, db } from './base';
 
 function getValues(snap) {
 	const values = snap.val();
@@ -26,14 +26,14 @@ function getValues(snap) {
 }
 
 function getCategories(callback) {
-	database.ref('/categories').once('value', snap => {
+	db.ref('/categories').once('value', snap => {
 		var fbCategories = getValues(snap);
 		callback(fbCategories);
 	});
 }
 
 function getTasks(filter, callback) {
-	var dbRef = database.ref('/tasks');
+	var dbRef = db.ref('/tasks');
 	if(filter !== "all") {
 		dbRef = dbRef.orderByChild("category").equalTo(filter);
 	}
@@ -72,16 +72,16 @@ class Categories extends React.Component {
 	}
 
 	removeCategory(category) {
-		database.ref('/categories/' + category).remove().catch((error) => {
+		db.ref('/categories/' + category).remove().catch((error) => {
 			console.log("There was an error while deleting category '" + category + "': " + error);
 		});
 	}
 
 	watchCategory() {
-		database.ref('/categories').on('child_removed', (snap) => {
+		db.ref('/categories').on('child_removed', (snap) => {
 			this.fillCategories();
 		});
-		database.ref('/categories').on('child_added', (snap) => {
+		db.ref('/categories').on('child_added', (snap) => {
 			this.fillCategories();
 		})
 	}
@@ -98,7 +98,7 @@ class Categories extends React.Component {
 			return;
 		var category_item = {}
 		category_item[category] = priority
-		database.ref('/categories').update(category_item).then(() => {
+		db.ref('/categories').update(category_item).then(() => {
 			document.getElementById('addCategoryInput').value = "";
 			document.getElementById('addPriorityInput').value = "";
 		}).catch((error) => {
@@ -146,10 +146,10 @@ class AddTask extends React.Component {
 	}
 
 	watchCategory() {
-		database.ref('/categories').on('child_removed', (snap) => {
+		db.ref('/categories').on('child_removed', (snap) => {
 			this.fillCategories();
 		});
-		database.ref('/categories').on('child_added', (snap) => {
+		db.ref('/categories').on('child_added', (snap) => {
 			this.fillCategories();
 		})
 	}
@@ -171,7 +171,7 @@ class AddTask extends React.Component {
 			"description": desc,
 
 		}
-		database.ref('/tasks').update(task_item).then(() => {
+		db.ref('/tasks').update(task_item).then(() => {
 			document.getElementById('addTaskInput').value = "";
 			document.getElementById('taskDescription').value = "";
 			document.getElementById('addTaskInput').focus();
@@ -229,10 +229,10 @@ class Tasks extends React.Component {
 	}
 
 	watchTasks() {
-		database.ref('/tasks').on('child_removed', (snap) => {
+		db.ref('/tasks').on('child_removed', (snap) => {
 			this.fillTasks();
 		});
-		database.ref('/tasks').on('child_added', (snap) => {
+		db.ref('/tasks').on('child_added', (snap) => {
 			this.fillTasks();
 		})
 	}
@@ -243,7 +243,7 @@ class Tasks extends React.Component {
 	}
 
 	removeTask(task) {
-		database.ref('/tasks/' + task).remove().catch((error) => {
+		db.ref('/tasks/' + task).remove().catch((error) => {
 			console.log("There was an error while deleting task '" + task + "': " + error);
 		});
 	}
@@ -339,7 +339,7 @@ class TaskDetailUpdater extends React.Component {
 			"category": category,
 			"description": desc
 		}
-		database.ref('/tasks').update(task_item).then(() => {
+		db.ref('/tasks').update(task_item).then(() => {
 			
 		}).catch((error) => {
 			console.log("There was an error while updating tasks in Firebase: " + error);
@@ -394,7 +394,7 @@ class TaskDetailHandler extends React.Component {
 	}
 
 	componentDidMount() {
-		database.ref('tasks/' + this.state.task + '/').once('value', snap => {
+		db.ref('tasks/' + this.state.task + '/').once('value', snap => {
 			var values = snap.val();
 			this.setState({
 				category: values['category'],
