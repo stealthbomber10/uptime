@@ -100,3 +100,5 @@ def getActualRoute():
 
 if __name__ == "__main__":
     app.run("0.0.0.0", port=80)
+
+# Actual URL to use: http://104.196.67.238/getActualTime?expected&category&title
