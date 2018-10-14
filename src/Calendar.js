@@ -1,19 +1,36 @@
 import React from "react";
 import dateFns from "date-fns";
-import {Popover, ButtonToolbar, OverlayTrigger, Button, DropdownButton} from "react-bootstrap";
+import {Popover, ButtonToolbar, OverlayTrigger, Button, Modal} from "react-bootstrap";
 
 class Calendar extends React.Component {
   state = {
     currentMonth: new Date(),
     selectedDate: new Date(),
-    popOverShow: false,
-    events: {}
+    events: {},
+    eventDetailsShow: false
   };
 
   constructor(props) {
     super(props);
     this.saveEvent = this.saveEvent.bind(this);
+    this.handleShow = this.handleShow.bind(this);
+    this.handleClose = this.handleClose.bind(this);
   }
+
+  handleClose() {
+    this.setState({ eventDetailsShow: false });
+  }
+
+  handleShow(item) {
+    this.setState({ 
+        eventDetailsShow: true,
+        event_title: item.event_title,
+        time_start: item.time_start,
+        time_end: item.time_end 
+    });
+    console.log(this.state.eventDetailsShow);
+  }
+
 
 //   events: {
 //       "2018-08-02": [
@@ -107,7 +124,14 @@ class Calendar extends React.Component {
     let days = [];
     let day = startDate;
     let formattedDate = "";
-
+    const styles= {
+        background: "#05c2e6",
+        width:"190px",
+        borderRadius: "15px",
+        display:"flex",
+        textAlign:"center",
+        zIndex: "10000"
+    }
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         formattedDate = dateFns.format(day, dateFormat);
@@ -115,16 +139,20 @@ class Calendar extends React.Component {
         let events_html = []
         if (this.state.events[day] != null) {
             this.state.events[day].forEach((item, i) => {
+
                 events_html.push(
-                    <li
+                    <div id="test"
                         className="event_list_item"
                         key={i}
+                        style={styles}
+                        onClick={() => this.handleShow(item)}
                     >
                         {item.event_title}
-                    </li>
+                        
+                    </div>
                 );
+                
             });
-            console.log(this.state.events);
         }
         
         days.push(
@@ -139,13 +167,11 @@ class Calendar extends React.Component {
                     key={day}
                     onClick={() => this.onDateClick(dateFns.parse(cloneDay))}
                 >
-                    <span className="number">{formattedDate}</span>
-                    <span className="bg">{formattedDate}</span>
                     <span className="events">
-                        <ul>
                             {events_html}
-                        </ul>
                     </span>
+                    <span className="number">{formattedDate}</span>
+                    
                 </div>
             </OverlayTrigger>
         );
@@ -161,6 +187,19 @@ class Calendar extends React.Component {
     return (<div className="body">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
         {rows}
+        <Modal show={this.state.eventDetailsShow} onHide={this.handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>{this.state.event_title}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Start Time: {this.state.time_start}<br/>
+            End Time: {this.state.time_end}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={this.handleClose}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+
 </div>);
   }
 

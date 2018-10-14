@@ -1,4 +1,5 @@
-import firebase from 'firebase';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 
 const app = firebase.initializeApp({
     apiKey: "AIzaSyAaQVWqEydHxXtcwaaRyEpiVhJ-vhPJfBo",
@@ -9,4 +10,8 @@ const app = firebase.initializeApp({
     messagingSenderId: "43889297910"
 });
 
-export default app;
+export const auth = firebase.auth();
+
+export const database = firebase.database(app);
+
+export default app

@@ -18,9 +18,9 @@ import * as firebase from 'firebase';
 import './index.css';
 import Calendar from './Calendar';
 import App from './App';
-import app from './firebase-config';
+import { app, database } from './firebase-config';
 
-const database = app.database();
+
 
 function getValues(snap) {
 	const values = snap.val();

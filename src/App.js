@@ -11,7 +11,6 @@ import Home from './Home';
 import LogIn from './LogIn';
 import SignUp from './SignUp';
 
-
 class App extends Component {
   state = { loading: true, authenticated: false, user: null };
 
