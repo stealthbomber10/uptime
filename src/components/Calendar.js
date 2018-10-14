@@ -3,6 +3,55 @@ import dateFns from "date-fns";
 import {Popover, ButtonToolbar, OverlayTrigger, Button, Modal, DropdownButton, MenuItem} from "react-bootstrap";
 import db from '../base';
 
+function getValues(snap) {
+	const values = snap.val();
+	var fbValues = []
+	if(values !== null && values !== undefined) {
+		var sortable = [];
+		for(var v in values) {
+			sortable.push([v, values[v]])
+		}
+		sortable.sort(function(a, b) {
+			return b[1] - a[1];
+		})
+		for (var i = 0; i < sortable.length; i ++)
+			fbValues.push(sortable[i][0]);
+	}
+	return fbValues;
+		
+}
+
+function getCategories(callback) {
+	db.ref('/categories').once('value', snap => {
+		var fbCategories = getValues(snap);
+		callback(fbCategories);
+	});
+}
+
+function getTasks(filter, callback) {
+	var dbRef = db.ref('/tasks');
+	if(filter !== "all") {
+		dbRef = dbRef.orderByChild("category").equalTo(filter);
+	}
+	dbRef.once('value', snap => {
+		var fbTasks = getValues(snap);
+		callback(fbTasks);
+	});
+}
+
+function ListItem(props) {
+	var removeStyle = {
+		paddingLeft: '80px',
+		color:'red'
+	}
+	return (
+		<li>
+			<Link to={props.url + props.value}>{props.value}</Link>
+			<span className="remove" style={removeStyle} onClick={() => props.remove(props.value)}>X</span>
+		</li>
+	)
+}
+
 class Calendar extends React.Component {
   state = {
     currentMonth: new Date(),
