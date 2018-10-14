@@ -1,25 +1,11 @@
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-// import './index.css';
-// import App from './App';
-// import * as serviceWorker from './serviceWorker';
-
-// ReactDOM.render(<App />, document.getElementById('root'));
-
-// // If you want your app to work offline and load faster, you can change
-// // unregister() to register() below. Note this comes with some pitfalls.
-// // Learn more about service workers: http://bit.ly/CRA-PWA
-// serviceWorker.unregister();
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import * as firebase from 'firebase';
-import firebase_config from './firebase-config.js'
 import './index.css';
-
-firebase.initializeApp(firebase_config);
-const database = firebase.database();
+import Calendar from './components/Calendar';
+import App from './App';
+import { app, database } from './base';
 
 function getValues(snap) {
 	const values = snap.val();
@@ -182,7 +168,8 @@ class AddTask extends React.Component {
 		var task_item = {}
 		task_item[task] = {
 			"category": category,
-			"description": desc
+			"description": desc,
+
 		}
 		database.ref('/tasks').update(task_item).then(() => {
 			document.getElementById('addTaskInput').value = "";
@@ -277,13 +264,13 @@ class Tasks extends React.Component {
 	}
 }
 
-function App(props) {
-	return (
-		<div>
-			<MainRoutes></MainRoutes>
-		</div>
-	)
-}
+// function App(props) {
+// 	return (
+// 		<div>
+// 			<MainRoutes></MainRoutes>
+// 		</div>
+// 	)
+// }
 
 function Header(props) {
 	return (
