@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: rgb(43, 30, 30);
 }
 
 .App-link {
@@ -255,4 +255,8 @@ main {
   flex-grow: 0;
   flex-basis: calc(100%/7);
   width: calc(100%/7);
+}
+
+.event-list-item {
+  background: blue;
 }
