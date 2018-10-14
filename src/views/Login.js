@@ -3,10 +3,12 @@ import React, { Component } from 'react';
 import { withStyles } from 'material-ui/styles';
 import PropTypes from 'prop-types';
 
-import Grid from 'material-ui/core/Grid';
-import Typography from 'material-ui/core/Typography';
+import Grid from 'material-ui/Grid';
+import Typography from 'material-ui/Typography';
 import SwipeableViews from 'react-swipeable-views';
 import Divider from 'material-ui/Divider';
+import AppBar from 'material-ui/AppBar';
+import Tabs, { Tab } from 'material-ui/Tabs';
 
 import LoginForm from './../components/LoginForm';
 import RegistrationForm from './../components/RegistrationForm';
@@ -66,6 +68,18 @@ class FullWidthTabs extends React.Component {
 
     return (
       <div className={classes.tabRoot} style={{ width: 500 }}>
+        <AppBar position="static" color="default">
+          <Tabs
+            value={this.state.value}
+            onChange={this.handleChange}
+            indicatorColor="primary"
+            textColor="primary"
+            fullWidth
+          >
+            <Tab label="Login" />
+            <Tab label="Register" />
+          </Tabs>
+        </AppBar>
         <SwipeableViews
           axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
           index={this.state.value}

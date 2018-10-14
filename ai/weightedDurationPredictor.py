@@ -50,7 +50,8 @@ if __name__ == "__main__":
 
     else:
 
-        pickle.dump(regression, open("durationPredictor.sav", "wb"))
+        pickle.dump(user_regression, open("durationPredictor.sav", "wb"))
+        pickle.dump(all_regression, open("durationPredictor.sav", "wb"))
         print "Model saved!"
 
     print "Total time taken was {}".format(time.time() - start)
