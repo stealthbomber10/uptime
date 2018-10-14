@@ -48,8 +48,9 @@ class Calendar extends React.Component {
     events: {},
     eventDetailsShow: false,
     category: {value: 'homework', label: 'Homework'},
-    start: '12AM',
-    end: '12AM'
+    start: {value: '12AM', label: '12AM'},
+    end: {value: '12AM', label: '12AM'},
+    completionTime: 'Calculating'
   };
 
   constructor(props) {
@@ -218,14 +219,14 @@ class Calendar extends React.Component {
     this.setState({ 
       start: selectedOption 
     });
-  }
-
-  handleEndChange = (selectedOption) => {
     fetch("http://104.196.67.238/getActualTime?title=" + document.getElementById('event_title').value + "&category=" + this.state.category.value)
       .then(res => res.json())
       .then(
         (result) => {
           console.log(result)
+          this.setState({
+            completionTime: result['actual']
+          })
         },
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
@@ -237,9 +238,37 @@ class Calendar extends React.Component {
           });
         }
       )
+  }
+
+  handleEndChange = (selectedOption) => {
     this.setState({ 
       end: selectedOption 
     });
+    var start_string = this.state.start.value;
+    var end_string = this.state.end.value;
+    var start_sub = start_string.slice(-2)
+    var end_sub = end_string.slice(-2)
+    var start = parseInt(start_string.replace(start_sub, ""))
+    var end = parseInt(end_string.replace(end_sub, ""))
+    fetch("http://104.196.67.238/getActualTime?expected=" + (Math.abs(end - start) * 60 + "&category=") + this.state.category.value)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          console.log(result)
+          this.setState({
+            completionTime: result['actual']
+          })
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          this.setState({
+            isLoaded: true,
+            error
+          });
+        }
+      )
   }
 
   renderCells() {
@@ -290,7 +319,7 @@ class Calendar extends React.Component {
                  <br></br>
                  <Dropdown id="start_time" id="start_time" options={start_time_options} value={this.state.start} placeholder="Select a category" onChange={this.handleStartChange}/>
                  <Dropdown id="end_time" id="end_time" options={end_time_options} value={this.state.end} placeholder="Select a category" onChange={this.handleEndChange}/>
-                  
+                  <label>Expected Completion Time: {this.state.completionTime}</label>
                  <button onClick={this.saveEvent}>Save</button>
         </Popover>
     );
