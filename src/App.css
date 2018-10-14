@@ -260,3 +260,8 @@ main {
 .event-list-item {
   background: blue;
 }
+
+.dropdown-menu {
+  height: 70px;
+  overflow-y: scroll;
+}
