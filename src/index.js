@@ -15,13 +15,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import * as firebase from 'firebase';
-import firebase_config from './firebase-config.js';
 import './index.css';
 import Calendar from './Calendar';
 import App from './App';
+import app from './firebase-config';
 
-firebase.initializeApp(firebase_config);
-const database = firebase.database();
+const database = app.database();
 
 function getValues(snap) {
 	const values = snap.val();

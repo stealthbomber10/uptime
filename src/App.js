@@ -4,9 +4,13 @@ import './App.css';
 import Calendar from './Calendar';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
+import PrivateRoute from './PrivateRoute';
+import app from './firebase-config'
+
 import Home from './Home';
-import Login from './Login';
-import SignUp from './SignUp/SignUpView';
+import LogIn from './LogIn';
+import SignUp from './SignUp';
+
 
 class App extends Component {
   state = { loading: true, authenticated: false, user: null };
@@ -35,32 +39,32 @@ class App extends Component {
     if (loading) return <p>Loading...</p>;
 
     return (
-      // <Router>
-      //   <div>
-      //     <PrivateRoute
-      //       exact
-      //       path="/"
-      //       component={Home}
-      //       authenticated={this.state.authenticated}/>
-      //     <Route exact path="/" component={Login} />
-      //     <Route exact path="/" component={SignUp} />
-      //   </div>
-      // </Router>
-      <div className="App">
-        <header className="App-header">
-         <h1>
-           UpTime!
-           </h1>
-          <Calendar/>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-          </a>
-        </header>
-      </div>
+      <Router>
+        <div>
+          <PrivateRoute
+            exact
+            path="/"
+            component={Home}
+            authenticated={this.state.authenticated}/>
+          <Route exact path="/" component={LogIn} />
+          <Route exact path="/" component={SignUp} />
+        </div>
+      </Router>
+      // {/* <div className="App">
+      //   <header className="App-header">
+      //    <h1>
+      //      UpTime!
+      //      </h1>
+      //     <Calendar/>
+      //     <a
+      //       className="App-link"
+      //       href="https://reactjs.org"
+      //       target="_blank"
+      //       rel="noopener noreferrer"
+      //     >
+      //     </a>
+      //   </header>
+      // </div> */}
     );
   }
 }

@@ -1,17 +1,16 @@
 import React, { Component } from "react";
+import LogInView from "./LogInView";
 import { withRouter } from "react-router";
 import app from "../firebase-config";
 
-import SignUpView from "./SignUpView";
-
-class SignUpContainer extends Component {
+class LogInContainer extends Component {
   handleSignUp = async event => {
     event.preventDefault();
     const { email, password } = event.target.elements;
     try {
       const user = await app
         .auth()
-        .createUserWithEmailAndPassword(email.value, password.value);
+        .signInWithEmailAndPassword(email.value, password.value);
       this.props.history.push("/");
     } catch (error) {
       alert(error);
@@ -19,8 +18,8 @@ class SignUpContainer extends Component {
   };
 
   render() {
-    return <SignUpView onSubmit={this.handleSignUp} />;
+    return <LogInView onSubmit={this.handleSignUp} />;
   }
 }
 
-export default withRouter(SignUpContainer);
+export default withRouter(LogInContainer);
